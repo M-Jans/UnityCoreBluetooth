@@ -7,6 +7,12 @@ using TMPro;
 #if UNITY_EDITOR_OSX || UNITY_IOS
 using UnityCoreBluetooth;
 
+[Serializable]
+public class DeviceListWrapper
+{
+    public List<string> deviceNames = new();
+}
+
 public class BluetoothDeviceManager : MonoBehaviour
 {
     public GameObject scrollViewContent; // Reference to Content object in Scroll View

@@ -1285,7 +1285,6 @@ GameObject:
   - component: {fileID: 1615285525}
   - component: {fileID: 1615285524}
   - component: {fileID: 1615285523}
-  - component: {fileID: 1615285527}
   - component: {fileID: 1615285528}
   m_Layer: 0
   m_Name: BluetoothScanner
@@ -1372,26 +1371,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1615285527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1615285522}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c727a008e8fe49a893dcfa66516a95a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scrollViewContent: {fileID: 1083876482}
-  textPrefab: {fileID: 3567386732203379472, guid: c367f77110c794b21984880dd5525bd5, type: 3}
-  scanButton: {fileID: 1874149048}
-  discoveredDevices:
-    deviceNames:
-    - Meta Quest 3
-  specificNamesList:
-  - Meta Quest 3
 --- !u!114 &1615285528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,11 +1386,9 @@ MonoBehaviour:
   scrollViewContent: {fileID: 1083876482}
   buttonPrefab: {fileID: 4401566878693686551, guid: 853d866343e7047c8836b8a86d7f2831, type: 3}
   scanButton: {fileID: 1874149048}
-  discoveredDevices:
-    deviceNames:
-    - Meta Quest 3
   specificNamesList:
   - Meta Quest 3
+  - CJ66QF9Q23
 --- !u!1 &1702649125
 GameObject:
   m_ObjectHideFlags: 0
