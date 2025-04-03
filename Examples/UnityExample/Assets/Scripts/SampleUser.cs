@@ -17,14 +17,14 @@ public class SampleUser : MonoBehaviour
     {
         manager = CoreBluetoothManager.Shared;
 
-        manager.OnUpdateState((string state) =>
+        manager.OnUpdateState(state =>
         {
             Debug.Log("state: " + state);
             if (state != "poweredOn") return;
             manager.StartScan();
         });
 
-        manager.OnDiscoverPeripheral((CoreBluetoothPeripheral peripheral) =>
+        manager.OnDiscoverPeripheral(peripheral =>
         {
             if (peripheral.name != "")
                 Debug.Log("discover peripheral name: " + peripheral.name); 
@@ -34,13 +34,13 @@ public class SampleUser : MonoBehaviour
             manager.ConnectToPeripheral(peripheral);
         });
 
-        manager.OnConnectPeripheral((CoreBluetoothPeripheral peripheral) =>
+        manager.OnConnectPeripheral(peripheral =>
         {
             Debug.Log("connected peripheral name: " + peripheral.name);
             peripheral.discoverServices();
         });
 
-        manager.OnDiscoverService((CoreBluetoothService service) =>
+        manager.OnDiscoverService(service =>
         {
             Debug.Log("discover service uuid: " + service.uuid);
             if (service.uuid != "FE55") return;
@@ -48,7 +48,7 @@ public class SampleUser : MonoBehaviour
         });
 
 
-        manager.OnDiscoverCharacteristic((CoreBluetoothCharacteristic characteristic) =>
+        manager.OnDiscoverCharacteristic(characteristic =>
         {
             this.characteristic = characteristic;
             string uuid = characteristic.Uuid;
@@ -62,10 +62,10 @@ public class SampleUser : MonoBehaviour
             }
         });
 
-        manager.OnUpdateValue((CoreBluetoothCharacteristic characteristic, byte[] data) =>
+        manager.OnUpdateValue((characteristic, data) =>
         {
-            this.value = data;
-            this.flag = true;
+            value = data;
+            flag = true;
         });
         manager.Start();
     }
@@ -78,7 +78,7 @@ public class SampleUser : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (this.transform.position.y < 0)
+        if (transform.position.y < 0)
         {
             vy = 0.0f;
             transform.position = new Vector3(0, 0, 0);
@@ -88,7 +88,7 @@ public class SampleUser : MonoBehaviour
             vy -= 0.006f;
             transform.position += new Vector3(0, vy, 0);
         }
-        this.transform.Rotate(2, -3, 4);
+        transform.Rotate(2, -3, 4);
         if (flag == false) return;
         flag = false;
         text.text = $"Notify: {BitConverter.ToInt32(value, 0)}";
