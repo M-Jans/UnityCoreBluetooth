@@ -1134,8 +1134,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 130}
-  m_SizeDelta: {x: 750, y: 900}
+  m_AnchoredPosition: {x: 0, y: 255.78345}
+  m_SizeDelta: {x: 850, y: 1200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1415685328
 MonoBehaviour:
@@ -1408,7 +1408,8 @@ MonoBehaviour:
   buttonPrefab: {fileID: 4401566878693686551, guid: 853d866343e7047c8836b8a86d7f2831, type: 3}
   scanButton: {fileID: 1874149048}
   discoveredDevices:
-    deviceNames: []
+    deviceNames:
+    - Meta Quest 3
   specificNamesList:
   - Meta Quest 3
 --- !u!1 &1702649125
@@ -1461,7 +1462,7 @@ GameObject:
   - component: {fileID: 1874149049}
   - component: {fileID: 1874149048}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ReScanButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1476,7 +1477,7 @@ RectTransform:
   m_GameObject: {fileID: 1874149046}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_LocalScale: {x: 1.6, y: 1.6, z: 1.6}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 898998786}
@@ -1485,8 +1486,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -420}
-  m_SizeDelta: {x: 256, y: 64}
+  m_AnchoredPosition: {x: 0, y: -550}
+  m_SizeDelta: {x: 300, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1874149048
 MonoBehaviour:

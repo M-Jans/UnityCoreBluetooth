@@ -14,9 +14,9 @@ public class BluetoothDeviceManager : MonoBehaviour
     public Button scanButton;           // Button to trigger re-scan
 
     private CoreBluetoothManager manager;
-    [SerializeField] private DeviceListWrapper discoveredDevices = new();
+    private readonly DeviceListWrapper discoveredDevices = new();
 
-    [SerializeField] private List<string> specificNamesList = new() { "Device1"}; // Editable in Inspector
+    [SerializeField] private List<string> specificNamesList = new() { "Device1" }; // Editable in Inspector
     private HashSet<string> specificNames; // Runtime HashSet for fast lookups
 
     void Start()
@@ -93,18 +93,25 @@ public class BluetoothDeviceManager : MonoBehaviour
 
         // Set the text to display the device name
         textComponent.text = deviceName;
-        Debug.Log($"Set button text: {deviceName}");
+
+        // Set text color: if the device name is in specificNames, use black; otherwise, use gray.
+        if (specificNames.Contains(deviceName))
+        {
+            textComponent.color = Color.black;
+        }
+        else
+        {
+            textComponent.color = Color.gray;
+        }
+        Debug.Log($"Set button text: {deviceName} with color {(textComponent.color == Color.black ? "black" : "gray")}");
 
         // Add functionality to the button
         Button buttonComponent = newButton.GetComponent<Button>();
-        if (buttonComponent != null)
-        {
-            buttonComponent.onClick.AddListener(() =>
+        buttonComponent?.onClick.AddListener(() =>
             {
                 Debug.Log($"Button clicked for device: {deviceName}");
-                // Add logic to handle device selection or connection here
+                // [TODO] Add logic to handle device selection or connection here
             });
-        }
     }
 
     void OnDestroy()
