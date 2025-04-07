@@ -61,13 +61,8 @@ public class BluetoothDeviceManager : MonoBehaviour
     public void StartScan()
     {
         // Clear existing list, reset discovered devices and dictionary
-        discoveredDevices.deviceNames.Clear();
-        discoveredPeripherals.Clear();
-        foreach (Transform child in scrollViewContent.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
+        ResetDeviceList();
+        
         // Start scanning for devices again
         manager.StartScan();
         Debug.Log("Scanning for devices...");
@@ -107,41 +102,7 @@ public class BluetoothDeviceManager : MonoBehaviour
         manager.OnConnectPeripheral(peripheral =>
         {
             Debug.Log("Successfully connected to peripheral: " + peripheral.name);
-
-            // Discover services
-            peripheral.discoverServices();
-
-            // Set up service discovery callback
-            manager.OnDiscoverService(service =>
-            {
-                Debug.Log("Discovered service with UUID: " + service.uuid);
-
-                // Discover characteristics for the service
-                service.discoverCharacteristics();
-
-                // Set up characteristic discovery callback
-                manager.OnDiscoverCharacteristic(characteristic =>
-                {
-                    Debug.Log("Discovered characteristic with UUID: " + characteristic.Uuid);
-
-                    // Check if the UUID matches the desired characteristic
-                    if (characteristic.Uuid == CustomCharacteristicUuid.ToString())
-                    {
-                        // Enable notifications for the characteristic
-                        characteristic.SetNotifyValue(true);
-                        Debug.Log("Notifications enabled for characteristic: " + characteristic.Uuid);
-
-                        // Write data to the characteristic (if needed)
-                        byte[] dataToSend = Encoding.UTF8.GetBytes("YourData");
-                        characteristic.Write(dataToSend);
-                        Debug.Log("Data written to characteristic: " + characteristic.Uuid);
-                    }
-                    else
-                    {
-                        Debug.Log("Characteristic UUID does not match. No actions taken.");
-                    }
-                });
-            });
+            DiscoverPeripheralServices(peripheral);
         });
 
         // Set up value update callback
@@ -163,6 +124,53 @@ public class BluetoothDeviceManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Discover services for the connected peripheral.
+    /// </summary>
+    /// <param name="peripheral">The peripheral to discover services for.</param>
+    private void DiscoverPeripheralServices(CoreBluetoothPeripheral peripheral)
+    {
+        peripheral.discoverServices();
+
+        // Set up service discovery callback
+        manager.OnDiscoverService(service =>
+        {
+            Debug.Log("Discovered service with UUID: " + service.uuid);
+            service.discoverCharacteristics();
+
+            // Set up characteristic discovery callback
+            manager.OnDiscoverCharacteristic(characteristic =>
+            {
+                HandleCharacteristicDiscovery(characteristic);
+            });
+        });
+    }
+
+    /// <summary>
+    /// Handles the discovery of Bluetooth characteristics.
+    /// </summary>
+    /// <param name="characteristic">The discovered characteristic.</param>
+    private void HandleCharacteristicDiscovery(CoreBluetoothCharacteristic characteristic)
+    {
+        Debug.Log("Discovered characteristic with UUID: " + characteristic.Uuid);
+
+        // Check if the UUID matches the desired characteristic
+        if (characteristic.Uuid == CustomCharacteristicUuid.ToString())
+        {
+            characteristic.SetNotifyValue(true); // Enable notifications
+            Debug.Log("Notifications enabled for characteristic: " + characteristic.Uuid);
+
+            // Write data to the characteristic (if needed)
+            byte[] dataToSend = Encoding.UTF8.GetBytes("YourData");
+            characteristic.Write(dataToSend);
+            Debug.Log("Data written to characteristic: " + characteristic.Uuid);
+        }
+        else
+        {
+            Debug.Log("Characteristic UUID does not match. No actions taken.");
+        }
+    }
+
+    /// <summary>
     /// Adds a discovered Bluetooth device to the UI list as a button.
     /// </summary>
     /// <param name="deviceName">The name of the discovered device.</param>
@@ -172,7 +180,6 @@ public class BluetoothDeviceManager : MonoBehaviour
 
         // Instantiate a new Button element from prefab under the scroll view content
         GameObject newButton = Instantiate(buttonPrefab, scrollViewContent.transform);
-        Debug.Log("Button instantiated.");
 
         // Get the TextMeshProUGUI component from the Button prefab
         TextMeshProUGUI textComponent = newButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -219,7 +226,21 @@ public class BluetoothDeviceManager : MonoBehaviour
     /// </summary>
     void OnDestroy()
     {
+        // Unsubscribe from events to avoid memory leaks
         manager?.Stop();
+    }
+
+    /// <summary>
+    /// Resets the device list UI and clears the device dictionaries.
+    /// </summary>
+    private void ResetDeviceList()
+    {
+        discoveredDevices.deviceNames.Clear();
+        discoveredPeripherals.Clear();
+        foreach (Transform child in scrollViewContent.transform)
+        {
+            Destroy(child.gameObject); // Clear the UI
+        }
     }
 }
 #endif
