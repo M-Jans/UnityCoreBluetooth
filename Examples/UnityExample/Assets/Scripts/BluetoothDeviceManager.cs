@@ -5,33 +5,46 @@ using UnityEngine.UI;
 using TMPro;
 using System.Text;
 
-
 #if UNITY_EDITOR_OSX || UNITY_IOS
 using UnityCoreBluetooth;
 
-[Serializable]
-public class DeviceListWrapper
-{
-    public List<string> deviceNames = new();
-}
-
+/// <summary>
+/// Manages Bluetooth device scanning, connection, and communication using the CoreBluetoothManager.
+/// This class handles scanning for available devices, displaying them in a UI, 
+/// and managing connections and data transfers to peripherals.
+/// </summary>
 public class BluetoothDeviceManager : MonoBehaviour
 {
-    public GameObject scrollViewContent; // Reference to Content object in Scroll View
-    public GameObject buttonPrefab;       // Prefab for list items
-    public Button scanButton;             // Button to trigger re-scan
+    // Reference to the Content object in Scroll View to display the list of devices
+    public GameObject scrollViewContent;
 
+    // Prefab for creating buttons in the list
+    public GameObject buttonPrefab;
+
+    // Button used to trigger re-scan of Bluetooth devices
+    public Button scanButton;
+
+    // The CoreBluetoothManager instance for managing Bluetooth interactions
     private CoreBluetoothManager manager;
+
+    // Holds the discovered device names and peripherals
     private readonly DeviceListWrapper discoveredDevices = new();
 
+    // UUID for the custom Bluetooth characteristic
     public static readonly Guid CustomCharacteristicUuid = new("72737C42-0FC3-49C6-B27E-8D19D6A0C1FA");
 
     // Dictionary to store discovered peripheral objects keyed by device name
     private Dictionary<string, CoreBluetoothPeripheral> discoveredPeripherals = new();
 
-    [SerializeField] private List<string> specificNamesList = new() { "Device1" }; // Editable in Inspector
-    private HashSet<string> specificNames; // Runtime HashSet for fast lookups
+    // List of specific device names to look for, editable in the Inspector
+    [SerializeField] private List<string> specificNamesList = new() { "Device1" };
 
+    // HashSet for runtime efficient lookups of specific device names
+    private HashSet<string> specificNames;
+
+    /// <summary>
+    /// Initializes the Bluetooth manager and starts scanning for devices.
+    /// </summary>
     void Start()
     {
         // Convert List to HashSet at runtime for efficient lookups
@@ -42,6 +55,9 @@ public class BluetoothDeviceManager : MonoBehaviour
         StartScan();
     }
 
+    /// <summary>
+    /// Starts scanning for Bluetooth devices, clearing previous device lists and resetting the UI.
+    /// </summary>
     public void StartScan()
     {
         // Clear existing list, reset discovered devices and dictionary
@@ -57,6 +73,9 @@ public class BluetoothDeviceManager : MonoBehaviour
         Debug.Log("Scanning for devices...");
     }
 
+    /// <summary>
+    /// Initializes the Bluetooth manager and sets up necessary callbacks for scanning, connecting, and data handling.
+    /// </summary>
     private void InitializeBluetoothManager()
     {
         // Initialize Bluetooth manager
@@ -143,6 +162,10 @@ public class BluetoothDeviceManager : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Adds a discovered Bluetooth device to the UI list as a button.
+    /// </summary>
+    /// <param name="deviceName">The name of the discovered device.</param>
     void AddDeviceToList(string deviceName)
     {
         Debug.Log($"Adding device to list: {deviceName}");
@@ -174,6 +197,10 @@ public class BluetoothDeviceManager : MonoBehaviour
             });
     }
 
+    /// <summary>
+    /// Attempts to connect to the selected Bluetooth device.
+    /// </summary>
+    /// <param name="deviceName">The name of the device to connect to.</param>
     private void ConnectToDevice(string deviceName)
     {
         if (discoveredPeripherals.TryGetValue(deviceName, out CoreBluetoothPeripheral peripheral))
@@ -187,6 +214,9 @@ public class BluetoothDeviceManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Stops the Bluetooth manager when the object is destroyed.
+    /// </summary>
     void OnDestroy()
     {
         manager?.Stop();
