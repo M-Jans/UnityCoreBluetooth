@@ -15,32 +15,69 @@ using UnityCoreBluetooth;
 /// </summary>
 public class BluetoothDeviceManager : MonoBehaviour
 {
-    // Reference to the Content object in Scroll View to display the list of devices
-    public GameObject scrollViewContent;
+    #region UI Components
 
-    // Prefab for creating buttons in the list
-    public GameObject buttonPrefab;
+    /// <summary>
+    /// The content object in the ScrollView where device buttons will be displayed.
+    /// </summary>
+    [SerializeField] private GameObject scrollViewContent;
 
-    // Button used to trigger re-scan of Bluetooth devices
-    public Button scanButton;
+    /// <summary>
+    /// Prefab used to create buttons for each discovered Bluetooth device in the list.
+    /// </summary>
+    [SerializeField] private GameObject buttonPrefab;
+    
+    /// <summary>
+    /// The button used to trigger a re-scan of Bluetooth devices.
+    /// </summary>
+    [SerializeField] private Button scanButton;
+    
+    #endregion
 
-    // The CoreBluetoothManager instance for managing Bluetooth interactions
-    private CoreBluetoothManager manager;
+    #region Bluetooth Manager
 
-    // Holds the discovered device names and peripherals
+    /// <summary>
+    /// The instance of the CoreBluetoothManager responsible for managing Bluetooth operations like scanning, connecting, and communication.
+    /// </summary>
+    private CoreBluetoothManager manager; 
+    
+    #endregion
+
+    #region Discovered Devices
+
+    /// <summary>
+    /// A wrapper to hold discovered device names for display and use in connection attempts.
+    /// </summary>
     private readonly DeviceListWrapper discoveredDevices = new();
+    
+    /// <summary>
+    /// A dictionary that holds the discovered peripheral devices by their name as the key.
+    /// </summary>
+    private Dictionary<string, CoreBluetoothPeripheral> discoveredPeripherals = new();
+    
+    #endregion
 
-    // UUID for the custom Bluetooth characteristic
+    #region Device Identification
+
+    /// <summary>
+    /// UUID for a custom Bluetooth characteristic that will be searched for on connected peripherals.
+    /// </summary>
     public static readonly Guid CustomCharacteristicUuid = new("72737C42-0FC3-49C6-B27E-8D19D6A0C1FA");
 
-    // Dictionary to store discovered peripheral objects keyed by device name
-    private Dictionary<string, CoreBluetoothPeripheral> discoveredPeripherals = new();
-
-    // List of specific device names to look for, editable in the Inspector
+    /// <summary>
+    /// A list of specific device names to look for when scanning for Bluetooth devices. 
+    /// Devices not in this list will be displayed in gray, while those in the list will be displayed in black.
+    /// </summary>
     [SerializeField] private List<string> specificNamesList = new() { "Device1" };
 
-    // HashSet for runtime efficient lookups of specific device names
+    /// <summary>
+    /// A hashset for runtime efficient lookups of device names that are considered specific devices of interest.
+    /// </summary>
     private HashSet<string> specificNames;
+    
+    #endregion
+
+    #region Unity Lifecycle Methods
 
     /// <summary>
     /// Initializes the Bluetooth manager and starts scanning for devices.
@@ -54,6 +91,19 @@ public class BluetoothDeviceManager : MonoBehaviour
         InitializeBluetoothManager();
         StartScan();
     }
+
+    /// <summary>
+    /// Stops the Bluetooth manager when the object is destroyed.
+    /// </summary>
+    void OnDestroy()
+    {
+        // Unsubscribe from events to avoid memory leaks
+        manager?.Stop();
+    }
+
+    #endregion
+
+    #region Bluetooth Scanning & Management
 
     /// <summary>
     /// Starts scanning for Bluetooth devices, clearing previous device lists and resetting the UI.
@@ -123,6 +173,10 @@ public class BluetoothDeviceManager : MonoBehaviour
         });
     }
 
+    #endregion
+
+    #region Device Connection & Communication
+
     /// <summary>
     /// Discover services for the connected peripheral.
     /// </summary>
@@ -171,6 +225,27 @@ public class BluetoothDeviceManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Attempts to connect to the selected Bluetooth device.
+    /// </summary>
+    /// <param name="deviceName">The name of the device to connect to.</param>
+    private void ConnectToDevice(string deviceName)
+    {
+        if (discoveredPeripherals.TryGetValue(deviceName, out CoreBluetoothPeripheral peripheral))
+        {
+            Debug.Log($"Attempting connection to device: {deviceName}");
+            manager.ConnectToPeripheral(peripheral);
+        }
+        else
+        {
+            Debug.LogWarning("Peripheral not found for device: " + deviceName);
+        }
+    }
+
+    #endregion
+
+    #region UI Management
+
+    /// <summary>
     /// Adds a discovered Bluetooth device to the UI list as a button.
     /// </summary>
     /// <param name="deviceName">The name of the discovered device.</param>
@@ -204,31 +279,9 @@ public class BluetoothDeviceManager : MonoBehaviour
             });
     }
 
-    /// <summary>
-    /// Attempts to connect to the selected Bluetooth device.
-    /// </summary>
-    /// <param name="deviceName">The name of the device to connect to.</param>
-    private void ConnectToDevice(string deviceName)
-    {
-        if (discoveredPeripherals.TryGetValue(deviceName, out CoreBluetoothPeripheral peripheral))
-        {
-            Debug.Log($"Attempting connection to device: {deviceName}");
-            manager.ConnectToPeripheral(peripheral);
-        }
-        else
-        {
-            Debug.LogWarning("Peripheral not found for device: " + deviceName);
-        }
-    }
+    #endregion
 
-    /// <summary>
-    /// Stops the Bluetooth manager when the object is destroyed.
-    /// </summary>
-    void OnDestroy()
-    {
-        // Unsubscribe from events to avoid memory leaks
-        manager?.Stop();
-    }
+    #region Helper Methods
 
     /// <summary>
     /// Resets the device list UI and clears the device dictionaries.
@@ -242,5 +295,7 @@ public class BluetoothDeviceManager : MonoBehaviour
             Destroy(child.gameObject); // Clear the UI
         }
     }
+
+    #endregion
 }
 #endif
